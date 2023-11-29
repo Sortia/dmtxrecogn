@@ -4,7 +4,7 @@ from segment import Segment
 
 def recognize(path, x, y):
     recognizer = DatamatrixRecognizer(path, Segment(x, y))
-    print(recognizer.magick())
+    return recognizer.magick()
 
 
 documents1 = [
@@ -30,7 +30,11 @@ documents2 = [
 ]
 
 for document in documents1:
-    recognize('images/' + document, 2, 6)
+    text = recognize('images/' + document, 2, 6)
+
+    print(document + ": " + text)
 
 for document in documents2:
-    recognize('images/' + document, 1, 6)
+    text = recognize('images/' + document, 1, 6)
+
+    print(document + ": " + text)

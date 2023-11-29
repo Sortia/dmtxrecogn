@@ -6,10 +6,11 @@ class DatamatrixRecognizer:
     def __init__(self, path, segment):
         self.resized_height = 2400
         self.resized_width = None
-        self.zone_scale_x = 2
-        self.zone_scale_y = 1.5
+        self.zone_scale_x = 2.5
+        self.zone_scale_y = 2.5
         self.bordered = None
 
+        self.timeout = 3
         self.path = path
         self.segment = segment
         self.count_x_segments = 3
@@ -23,7 +24,10 @@ class DatamatrixRecognizer:
     def process_img(img):
         img = cv2.convertScaleAbs(img, alpha=1.5, beta=30)
 
-        _, binary_img = cv2.threshold(img, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        img = clahe.apply(img)
+
+        _, img = cv2.threshold(img, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
 
         return img
 
@@ -53,9 +57,8 @@ class DatamatrixRecognizer:
 
         return img[y:crop_y, x:crop_x]
 
-    @staticmethod
-    def get_dmtx_text(img):
-        data = decode(img, timeout=5000, max_count=1)
+    def get_dmtx_text(self, img):
+        data = decode(img, timeout=self.timeout * 1000, max_count=1)
 
         if data:
             return data[0].data.decode('utf-8')
@@ -85,7 +88,7 @@ class DatamatrixRecognizer:
 
     def prepare_img(self, img):
         img = self.resize_img(img)
-        img = self.add_border(img)
+        # img = self.add_border(img)
         img = self.crop_img(img)
         img = self.process_img(img)
 

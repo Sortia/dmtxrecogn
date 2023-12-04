@@ -1,6 +1,6 @@
 from datamatrixRecognizer import DatamatrixRecognizer
 from segment import Segment
-
+import time
 
 def recognize(path, x, y):
     recognizer = DatamatrixRecognizer(path, Segment(x, y))
@@ -8,33 +8,47 @@ def recognize(path, x, y):
 
 
 documents1 = [
-    '1.png',
-    '2.png',
-    '3.png',
-    '4.png',
-    '5.png',
+    '01.png',
+    '02.png',
+    '03.png',
+    '04.png',
+    '05.png',
 ]
 
 documents2 = [
-    '20231129135703-1.png',
-    '20231129135703-2.png',
-    '20231129135703-3.png',
-    '20231129135703-4.png',
-    '20231129135703-5.png',
-    '20231129135703-6.png',
-    '20231129135703-7.png',
-    'img_1.png',
-    'img_2.png',
-    'img_3.png',
-    'img_4.png',
+    '06.png',
+    '07.png',
+    '08.png',
+    '09.png',
+    '10.png',
+    '11.png',
+    '12.png',
+    '13.png',
+    '14.png',
+    '15.png',
+    '16.png',
 ]
+start_time = time.time()
 
 for document in documents1:
+    start_doc_time = time.time()
     text = recognize('images/' + document, 2, 6)
+    end_doc_time = time.time()
+    execution_doc_time = end_doc_time - start_doc_time
+    rounded_time = round(execution_doc_time * 1000) / 1000
 
-    print(document + ": " + text)
+    print(document + " " + str(rounded_time) + "s " + text)
 
 for document in documents2:
+    start_doc_time = time.time()
     text = recognize('images/' + document, 1, 6)
+    end_doc_time = time.time()
+    execution_doc_time = end_doc_time - start_doc_time
+    rounded_time = round(execution_doc_time * 1000) / 1000
 
-    print(document + ": " + text)
+    print(document + " " + str(rounded_time) + "s " + text)
+
+end_time = time.time()
+execution_time = end_time - start_time
+
+print(f"Время выполнения скрипта: {execution_time} секунд")

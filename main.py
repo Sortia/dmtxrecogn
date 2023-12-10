@@ -7,7 +7,7 @@ from datamatrixRecognizer import DatamatrixRecognizer
 
 
 async def main():
-    path = sys.argv[1]
+    paths = sys.argv[1]
 
     if os.name == 'nt':
         j_doc = json.load(sys.stdin)
@@ -18,9 +18,15 @@ async def main():
             raise Exception('Pipe is empty.')
 
     recognizer = DatamatrixRecognizer()
-    return await recognizer.magick(path, j_doc)
+
+    tasks = [recognizer.magick(path, j_doc) for path in paths.split(",")]
+
+    result = {"files": await asyncio.gather(*tasks)}
+
+    return result
 
 
 results = asyncio.run(main())
 
 print(json.dumps({"results": results}))
+

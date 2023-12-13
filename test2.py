@@ -11,6 +11,12 @@ async def main(pdf_path, params):
 
 
 imgs = [
+    "images/01.png",
+    "images/02.png",
+    "images/03.png",
+    "images/04.png",
+    "images/05.png",
+
     "scans/06.png",
     "scans/07.png",
     "scans/08.png",
@@ -33,7 +39,15 @@ imgs = [
     "scans/33.jpg",
     "scans/34.jpg",
 
+    "scans/61.jpg",
+    "scans/62.jpg",
+    "scans/63.jpg",
+    "scans/64.jpg",
+
     "scans/41.jpg",
+    "scans/71.pdf",
+    "scans/72.pdf",
+    "scans/73.pdf",
 ]
 
 for img in imgs:

@@ -1,5 +1,4 @@
 import asyncio
-
 import cv2
 import numpy as np
 from pylibdmtx.pylibdmtx import decode
@@ -14,7 +13,7 @@ class DatamatrixRecognizer:
         self.zone_scale_x = 2
         self.zone_scale_y = 2
 
-        self.timeout = 1
+        self.timeout = 500
         self.count_x_segments = 3
         self.count_y_segments = 6
 
@@ -29,9 +28,13 @@ class DatamatrixRecognizer:
         else:
             return [cv2.imread(path, cv2.IMREAD_GRAYSCALE)]
 
-    def img_preprocessing(self, img):
+    def contrast(self, img):
         img = cv2.convertScaleAbs(img, alpha=1, beta=5)
         _, img = cv2.threshold(img, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+
+        return img;
+
+    def img_preprocessing(self, img):
         # img = cv2.GaussianBlur(img, (3, 3), 50)
         # img = self.erode(img)
         # img = self.fill_white_regions(img)
@@ -135,7 +138,7 @@ class DatamatrixRecognizer:
         return img[y:crop_y, x:crop_x]
 
     def get_dmtx_text(self, img):
-        data = decode(img, timeout=self.timeout * 1000, max_count=1)
+        data = decode(img, timeout=self.timeout, max_count=1)
 
         if data:
             return [data[0].data.decode('utf-8')]
@@ -152,17 +155,64 @@ class DatamatrixRecognizer:
         rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
         return cv2.warpAffine(img, rotation_matrix, (width, height))
 
-    def prepare_img(self, img, params):
+    def crop_white(self, img):
+        height = img.shape[0]
+        white_rows = np.all(img == 255, axis=1)[::-1]
+        my_array = np.asarray(white_rows)
+        count = 0
+
+        for i in range(1, len(my_array)):
+            if my_array[i]:
+                count += 1
+            else:
+                break
+
+        return img[0:(height - count), :]
+
+    def prepare_img1(self, img, params):
         img = self.resize_img(img)
         img = self.crop_img(img, params)
+        img = self.contrast(img)
         img = self.img_preprocessing(img)
-        img = self.add_borders(img)
+        cv2.imwrite('output_image.png', img)  # Сохранить в формате PNG
+        return img
+
+    def prepare_img2(self, img, params):
+        img = self.crop_white(img)
+        img = self.resize_img(img)
+        img = self.crop_img(img, params)
+        img = self.contrast(img)
+        cv2.imwrite('output_image.png', img)  # Сохранить в формате PNG
+        return img
+
+    def prepare_img3(self, img, params):
+        img = self.crop_white(img)
+        img = self.resize_img(img)
+        img = self.crop_img(img, params)
+        cv2.imwrite('output_image.png', img)  # Сохранить в формате PNG
+        return img
+
+    def prepare_img4(self, img):
         cv2.imwrite('output_image.png', img)  # Сохранить в формате PNG
         return img
 
     async def process_img(self, img, params):
-        prepared_img = self.prepare_img(img, params)
-        return self.get_dmtx_text(prepared_img)
+        prepared_img = self.prepare_img1(img, params)
+        recognized_text = self.get_dmtx_text(prepared_img)
+
+        if not len(recognized_text):
+            prepared_img = self.prepare_img2(img, params)
+            recognized_text = self.get_dmtx_text(prepared_img)
+
+        if not len(recognized_text):
+            prepared_img = self.prepare_img3(img, params)
+            recognized_text = self.get_dmtx_text(prepared_img)
+
+        if not len(recognized_text):
+            prepared_img = self.prepare_img4(img)
+            recognized_text = self.get_dmtx_text(prepared_img)
+
+        return recognized_text
 
     async def magick(self, path, params):
         img_list = self.get_img_list(path)

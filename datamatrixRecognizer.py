@@ -36,7 +36,7 @@ class DatamatrixRecognizer:
 
     def img_preprocessing(self, img):
         # img = cv2.GaussianBlur(img, (3, 3), 50)
-        # img = self.erode(img)
+        img = self.erode(img)
         # img = self.fill_white_regions(img)
         # img = self.build_datamatrix(img)
         img = self.morphologyEx(img)
@@ -174,7 +174,6 @@ class DatamatrixRecognizer:
         img = self.crop_img(img, params)
         img = self.contrast(img)
         img = self.img_preprocessing(img)
-        cv2.imwrite('output_image.png', img)  # Сохранить в формате PNG
         return img
 
     def prepare_img2(self, img, params):
@@ -182,18 +181,15 @@ class DatamatrixRecognizer:
         img = self.resize_img(img)
         img = self.crop_img(img, params)
         img = self.contrast(img)
-        cv2.imwrite('output_image.png', img)  # Сохранить в формате PNG
         return img
 
     def prepare_img3(self, img, params):
         img = self.crop_white(img)
         img = self.resize_img(img)
         img = self.crop_img(img, params)
-        cv2.imwrite('output_image.png', img)  # Сохранить в формате PNG
         return img
 
     def prepare_img4(self, img):
-        cv2.imwrite('output_image.png', img)  # Сохранить в формате PNG
         return img
 
     async def process_img(self, img, params):
@@ -211,6 +207,8 @@ class DatamatrixRecognizer:
         if not len(recognized_text):
             prepared_img = self.prepare_img4(img)
             recognized_text = self.get_dmtx_text(prepared_img)
+
+        # cv2.imwrite('output_image.png', prepared_img)  # Сохранить в формате PNG
 
         return recognized_text
 

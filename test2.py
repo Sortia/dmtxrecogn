@@ -44,6 +44,16 @@ imgs = [
     "scans/63.jpg",
     "scans/64.jpg",
 
+    "scans/81.jpg",
+    "scans/82.jpg",
+    "scans/83.jpg",
+    "scans/84.jpg",
+
+    "scans/91.jpg",
+    "scans/92.jpg",
+    "scans/93.jpg",
+    "scans/94.jpg",
+
     "scans/41.jpg",
     "scans/71.pdf",
     "scans/72.pdf",

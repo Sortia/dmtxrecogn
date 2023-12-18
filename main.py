@@ -26,7 +26,8 @@ async def main():
     return result
 
 
-results = asyncio.run(main())
+loop = asyncio.get_event_loop()
+results = loop.run_until_complete(main())
+loop.close()
 
 print(json.dumps({"results": results}))
-
